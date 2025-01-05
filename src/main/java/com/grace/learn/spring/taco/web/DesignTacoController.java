@@ -3,11 +3,14 @@ package com.grace.learn.spring.taco.web;
 import com.grace.learn.spring.taco.data.Ingredient;
 import com.grace.learn.spring.taco.data.Taco;
 import com.grace.learn.spring.taco.data.TacoOrder;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,12 +46,12 @@ public class DesignTacoController {
         }
     }
 
-    @ModelAttribute (name = "tacoOrder")
+    @ModelAttribute(name = "tacoOrder")
     public TacoOrder order() {
         return new TacoOrder();
     }
 
-    @ModelAttribute (name = "taco")
+    @ModelAttribute(name = "taco")
     public Taco taco() {
         return new Taco();
     }
@@ -57,10 +60,20 @@ public class DesignTacoController {
     public String showDesignForm() {
         return "design";
     }
+//    @GetMapping
+//    public String showDesignForm(Model model) {
+//        model.addAttribute("taco", new Taco());
+//        return "design";
+//    }
 
     @PostMapping
-    public String processTaco(Taco taco,
+    public String processTaco(@Valid Taco taco,
+                              Errors errors,
                               @ModelAttribute TacoOrder tacoOrder) {
+        if (errors.hasErrors()) {
+            return "design";
+        }
+
         tacoOrder.addTaco(taco);
         log.info("Processing taco: {}", taco);
         return "redirect:/orders/current";
